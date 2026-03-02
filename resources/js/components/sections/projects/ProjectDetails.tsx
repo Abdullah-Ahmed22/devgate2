@@ -93,7 +93,7 @@ const ProjectDetails = () => {
                                         <img
                                             src={`${API_URL}/storage/${project.image1}`}
                                             alt="project"
-                                            className="img-fluid"
+                                             className="project-image"
                                         />
                                     </div>
                                 )}
@@ -115,7 +115,9 @@ const ProjectDetails = () => {
                                         <img
                                             src={`${API_URL}/storage/${project.image2}`}
                                             alt="project"
-                                            className="img-fluid"
+                                               className="project-image"
+                                              
+
                                         />
                                     </div>
                                 )}
@@ -125,7 +127,7 @@ const ProjectDetails = () => {
                                         <img
                                             src={`${API_URL}/storage/${project.image3}`}
                                             alt="project"
-                                            className="img-fluid"
+                                            className="project-image"
                                         />
                                     </div>
                                 )}

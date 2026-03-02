@@ -144,7 +144,7 @@ const Contact = () => {
                   {/* Message */}
                   <div className="mb-4">
                     <label className={`form-label ${errors.message ? "text-danger" : ""}`}>
-                      {errors.message ? errors.message : "Your Message"}
+                      {errors.message ? errors.message : "Your Message (required)"}
                     </label>
                     <textarea
                       name="message"
