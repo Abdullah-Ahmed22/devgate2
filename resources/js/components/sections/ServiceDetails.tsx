@@ -87,7 +87,7 @@ const ServiceDetails = () => {
             <img
               src={ `${API_URL}/storage/${service.image1}`}
               alt={service.title}
-              className="img-fluid"
+          className="project-image"
             />
           </div>
         )}
@@ -111,9 +111,9 @@ const ServiceDetails = () => {
         {service.image2 && (
           <div className="mb-4">
             <img
-              src={service.image2}
+             src={ `${API_URL}/storage/${service.image2}`}
               alt=""
-              className="img-fluid"
+              className="project-image"
             />
           </div>
         )}

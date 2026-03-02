@@ -32,7 +32,7 @@ class StatisticController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'number' => 'required|unsignedInteger',
+           'number' => 'required|integer|min:0',
             'title' => 'required|string|max:255',
         ]);
 
@@ -49,7 +49,7 @@ class StatisticController extends Controller
     public function update(Request $request, $id)
     {
         $data = $request->validate([
-            'number' => 'nullable|unsignedInteger',
+       'number' => 'required|integer|min:0',
             'title' => 'nullable|string|max:255',
         ]);
 

@@ -485,4 +485,11 @@
   background: #1e7e34; 
 }
 
-
+.project-image {
+    width: 100%;
+    max-width: 700px;
+    height: 400px;     
+    object-fit: cover;  
+    display: block;
+    margin: 0 auto;    
+}
