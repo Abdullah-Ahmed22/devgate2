@@ -79,9 +79,11 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::post('/abouttitle', [AboutTitleController::class, 'store'])->name('store');
     Route::put('/abouttitle/{id}', [AboutTitleController::class, 'update'])->where(['id' => '[0-9]+'])->name('update');
-    
+    Route::delete('/abouttitle/{id}', [AboutTitleController::class, 'destroy'])->where(['id' => '[0-9]+'])->name('destroy');
+
     Route::post('/about', [AboutController::class, 'store'])->name('store');
     Route::put('/about/{id}', [AboutController::class, 'update'])->where(['id' => '[0-9]+'])->name('update');
+    Route::delete('/about/{id}', [AboutController::class, 'destroy'])->where(['id' => '[0-9]+'])->name('destroy');
 
     Route::post('/homeimage', [HomeImageController::class, 'store'])->name('store');
     Route::delete('/homeimage/{id}', [HomeImageController::class, 'destroy'])->where(['id' => '[0-9]+'])->name('destroy');
