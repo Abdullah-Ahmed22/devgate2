@@ -16,9 +16,6 @@ return new class extends Migration
             $table->string('image');
             $table->string('header');
             $table->text('header_description');
-            $table->text('text1');
-            $table->text('text2');
-            $table->text('text3');
             $table->timestamps();
         });
     }

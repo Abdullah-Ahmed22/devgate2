@@ -12,8 +12,5 @@ class About extends Model
         'image',
         'header',
         'header_description',
-        'text1',
-        'text2',
-        'text3',
     ];
 }

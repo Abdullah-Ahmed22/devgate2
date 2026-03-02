@@ -25,9 +25,6 @@ class AboutRequest extends FormRequest
             'image' => ['required', 'image', 'mimes:png,jpg,jpeg'],
             'header' => ['required', 'min:3'],
             'header_description' => ['required'],
-            'text1' => ['required'],
-            'text2' => ['required'],
-            'text3' => ['required'],
         ];
     }
 
@@ -42,10 +39,6 @@ class AboutRequest extends FormRequest
             'header.min' => 'Header must be at least 3 characters.',
 
             'header_description.required' => 'Header description is required.',
-
-            'text1.required' => 'Text1 is required.',
-            'text2.required' => 'Text2 is required.',
-            'text3.required' => 'Text3 is required.',
         ];
     }
 }

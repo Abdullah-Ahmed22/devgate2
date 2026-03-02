@@ -24,6 +24,7 @@ class AboutTitleRequest extends FormRequest
         return [
             'title' => ['required'],
             'description' => ['required'],
+            'text' => ['required'],
         ];
     }
 
@@ -32,6 +33,7 @@ class AboutTitleRequest extends FormRequest
         return [
             'title.required' => 'Title is required.',
             'description.required' => 'Description is required.',
+            'text.required' => 'Text is required.',
         ];
     }
 }
