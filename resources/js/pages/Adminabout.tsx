@@ -1,267 +1,315 @@
-import { useEffect, useState, ChangeEvent } from "react";
-
-interface AboutTitle {
-  id: number;
-  title: string;
-  description: string;
-}
+import { useEffect, useState } from "react";
 
 interface MainAbout {
-  id: number;
+  id?: number;
   image: string;
   header: string;
   header_description: string;
-  text1: string;
-  text2: string;
-  text3: string;
 }
 
-const AdminAbout: React.FC = () => {
+interface AboutTitle {
+  id?: number;
+  title: string;
+  description: string;
+  text: string;
+}
+
+const AdminAbout = () => {
   const API_URL = import.meta.env.VITE_API_URL;
-  const [titles, setTitles] = useState<AboutTitle[]>([]);
-  const [main, setMain] = useState<MainAbout | null>(null);
+  const token = localStorage.getItem("token");
+
+  const [main, setMain] = useState<MainAbout>({
+    image: "",
+    header: "",
+    header_description: "",
+  });
+
+  const [mainExists, setMainExists] = useState(false);
   const [imageFile, setImageFile] = useState<File | null>(null);
+
+  const [titles, setTitles] = useState<AboutTitle[]>([]);
+  const [newTitle, setNewTitle] = useState<AboutTitle>({
+    title: "",
+    description: "",
+    text: "",
+  });
+
   const [loading, setLoading] = useState(true);
 
-  const token = localStorage.getItem("token");
 
   useEffect(() => {
     Promise.all([
-      fetch(`${API_URL}/api/abouttitle`),
-      fetch(`${API_URL}/api/about`)
+      fetch(`${API_URL}/api/about`),
+      fetch(`${API_URL}/api/abouttitle`)
     ])
-      .then(async ([titlesRes, mainRes]) => {
-        const titlesData = await titlesRes.json();
+      .then(async ([mainRes, titlesRes]) => {
         const mainData = await mainRes.json();
+        const titlesData = await titlesRes.json();
+
+        if (mainData.length > 0) {
+          setMain(mainData[0]);
+          setMainExists(true);
+        }
 
         setTitles(titlesData);
-        setMain(mainData[0]); // about returns array
         setLoading(false);
       })
-      .catch((err) => {
-        console.error(err);
-        setLoading(false);
-      });
+      .catch(() => setLoading(false));
   }, []);
 
-  // ----------------------------
-  // TITLE UPDATE
-  // ----------------------------
-  const handleTitleChange = (
-    id: number,
-    field: keyof AboutTitle,
-    value: string
-  ) => {
-    setTitles((prev) =>
-      prev.map((item) =>
-        item.id === id ? { ...item, [field]: value } : item
-      )
-    );
-  };
 
-  const handleTitleSave = async (id: number, item: AboutTitle) => {
-    try {
-      await fetch(`${API_URL}/api/abouttitle/${id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(item),
-      });
-
-      alert("Title updated ✅");
-    } catch {
-      alert("Update failed ❌");
-    }
-  };
-
-  // ----------------------------
-  // MAIN UPDATE
-  // ----------------------------
-  const handleMainChange = (
-    field: keyof MainAbout,
-    value: string
-  ) => {
-    if (!main) return;
+  const handleMainChange = (field: keyof MainAbout, value: string) => {
     setMain({ ...main, [field]: value });
   };
 
-  const handleMainSave = async () => {
-  if (!main) return;
+  const handleMainSubmit = async () => {
+    const formData = new FormData();
+    formData.append("header", main.header);
+    formData.append("header_description", main.header_description);
 
-  const formData = new FormData();
+    if (imageFile) {
+      formData.append("image", imageFile);
+    }
 
-  // Laravel method spoofing
-  formData.append("_method", "PUT");
+    try {
+      const url = mainExists
+        ? `${API_URL}/api/about/${main.id}`
+        : `${API_URL}/api/about`;
 
-  formData.append("header", main.header);
-  formData.append("header_description", main.header_description);
-  formData.append("text1", main.text1);
-  formData.append("text2", main.text2);
-  formData.append("text3", main.text3);
+      const method = mainExists ? "POST" : "POST";
 
-  if (imageFile) {
-    formData.append("image", imageFile);
-  }
+      if (mainExists) {
+        formData.append("_method", "PUT");
+      }
 
-  try {
-    const response = await fetch(
-      `${API_URL}/api/about/${main.id}`,
-      {
-        method: "POST", 
+      const res = await fetch(url, {
+        method,
         headers: {
           Authorization: `Bearer ${token}`,
         },
         body: formData,
-      }
-    );
+      });
 
-    if (!response.ok) {
-      throw new Error("Update failed");
+      if (!res.ok) throw new Error();
+
+      alert(mainExists ? "Updated ✅" : "Created ✅");
+  
+    } catch {
+      alert("Operation failed ❌");
     }
+  };
 
-    alert("Main content updated ✅");
-  } catch (error) {
-    console.error(error);
-    alert("Update failed ❌");
-  }
-};
+
+  const handleAddTitle = async () => {
+    try {
+      const res = await fetch(`${API_URL}/api/abouttitle`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(newTitle),
+      });
+
+      if (!res.ok) throw new Error();
+
+      alert("Added ✅");
+
+    } catch {
+      alert("Failed ❌");
+    }
+  };
+
+  const handleUpdateTitle = async (item: AboutTitle) => {
+    try {
+      const res = await fetch(
+        `${API_URL}/api/abouttitle/${item.id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(item),
+        }
+      );
+
+      if (!res.ok) throw new Error();
+
+      alert("Updated ✅");
+    } catch {
+      alert("Failed ❌");
+    }
+  };
+
+
+  const handleDeleteTitle = async (id?: number) => {
+    if (!window.confirm("Delete this item?")) return;
+
+    try {
+      await fetch(`${API_URL}/api/abouttitle/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      setTitles(titles.filter((item) => item.id !== id));
+    } catch {
+      alert("Delete failed ❌");
+    }
+  };
 
   if (loading) return <div className="text-center mt-5">Loading...</div>;
 
   return (
     <div className="container mt-5">
+
       <h2 className="mb-4">Manage About Section</h2>
 
+      {/* ===================== MAIN ABOUT ===================== */}
+      <div className="card p-4 mb-5 shadow-sm">
+        <h4>{mainExists ? "Edit Main About" : "Create Main About"}</h4>
 
-      {/* MAIN CONTENT EDIT */}
-      {main && (
-  <div className="card p-4 mb-5 shadow-sm">
-    <h4 className="mb-4">Main Content</h4>
+        <label className="fw-bold mt-3">Header</label>
+        <input
+          className="form-control"
+          value={main.header}
+          onChange={(e) => handleMainChange("header", e.target.value)}
+        />
 
-    {/* Header */}
-    <label className="form-label fw-bold">Header</label>
-    <input
-      type="text"
-      className="form-control mb-3"
-      value={main.header}
-      onChange={(e) =>
-        handleMainChange("header", e.target.value)
-      }
-    />
+        <label className="fw-bold mt-3">Header Description</label>
+        <textarea
+          className="form-control"
+          rows={3}
+          value={main.header_description}
+          onChange={(e) =>
+            handleMainChange("header_description", e.target.value)
+          }
+        />
 
-    {/* Header Description */}
-    <label className="form-label fw-bold">
-      Header Description
-    </label>
-    <textarea
-      className="form-control mb-4"
-      rows={3}
-      value={main.header_description}
-      onChange={(e) =>
-        handleMainChange("header_description", e.target.value)
-      }
-    />
+        <label className="fw-bold mt-3">Image</label>
+        <input
+          type="file"
+          className="form-control"
+          onChange={(e) =>
+            setImageFile(e.target.files?.[0] || null)
+          }
+        />
 
-    {/* Dynamic Text Fields Based On Titles */}
-    {titles.map((title, index) => {
-      const fieldName =
-        index === 0
-          ? "text1"
-          : index === 1
-          ? "text2"
-          : "text3";
-
-      const value =
-        index === 0
-          ? main.text1
-          : index === 1
-          ? main.text2
-          : main.text3;
-
-      return (
-        <div key={title.id} className="mb-4">
-          <label className="form-label fw-bold">
-            {title.title} → Content
-          </label>
-
-          <textarea
-            className="form-control"
-            rows={4}
-            value={value}
-            onChange={(e) =>
-              handleMainChange(
-                fieldName as keyof MainAbout,
-                e.target.value
-              )
-            }
+        {mainExists && main.image && (
+          <img
+            src={`${API_URL}/storage/${main.image}`}
+            alt=""
+            style={{ maxWidth: "200px", marginTop: "15px" }}
           />
-        </div>
-      );
-    })}
+        )}
 
-    {/* Image Upload */}
-    <label className="form-label fw-bold">Upload Image</label>
-    <input
-      type="file"
-      className="form-control mb-3"
-      onChange={(e) =>
-        setImageFile(e.target.files?.[0] || null)
-      }
-    />
+        <button
+          className="btn btn-success mt-4"
+          onClick={handleMainSubmit}
+        >
+          {mainExists ? "Update" : "Create"}
+        </button>
+      </div>
 
-    {/* Image Preview */}
-    <img
-      src={`${API_URL}/storage/${main.image}`}
-      alt="preview"
-      style={{
-        maxWidth: "200px",
-        marginBottom: "15px",
-        borderRadius: "8px",
-      }}
-    />
+      {/* ===================== ADD TITLE ===================== */}
+      <div className="card p-4 mb-5 shadow-sm">
+        <h4>Add New About Section</h4>
 
-    <button
-      className="btn btn-success"
-      onClick={handleMainSave}
-    >
-      Save Main Content
-    </button>
-  </div>
-)}
+        <input
+          className="form-control mb-3"
+          placeholder="Title"
+          value={newTitle.title}
+          onChange={(e) =>
+            setNewTitle({ ...newTitle, title: e.target.value })
+          }
+        />
 
+        <textarea
+          className="form-control mb-3"
+          placeholder="Short Description"
+          value={newTitle.description}
+          onChange={(e) =>
+            setNewTitle({ ...newTitle, description: e.target.value })
+          }
+        />
 
+        <textarea
+          className="form-control mb-3"
+          rows={4}
+          placeholder="Full Text"
+          value={newTitle.text}
+          onChange={(e) =>
+            setNewTitle({ ...newTitle, text: e.target.value })
+          }
+        />
 
-      {/* TITLES EDIT */}
-    
+        <button className="btn btn-primary" onClick={handleAddTitle}>
+          Add Section
+        </button>
+      </div>
+
+      {/* ===================== EDIT TITLES ===================== */}
       {titles.map((item) => (
         <div key={item.id} className="card p-4 mb-4 shadow-sm">
-          <h4>Edit {item.title}</h4>
+          <h5>Edit: {item.title}</h5>
 
           <input
-            type="text"
             className="form-control mb-3"
             value={item.title}
             onChange={(e) =>
-              handleTitleChange(item.id, "title", e.target.value)
+              setTitles(
+                titles.map((t) =>
+                  t.id === item.id
+                    ? { ...t, title: e.target.value }
+                    : t
+                )
+              )
+            }
+          />
+
+          <textarea
+            className="form-control mb-3"
+            value={item.description}
+            onChange={(e) =>
+              setTitles(
+                titles.map((t) =>
+                  t.id === item.id
+                    ? { ...t, description: e.target.value }
+                    : t
+                )
+              )
             }
           />
 
           <textarea
             className="form-control mb-3"
             rows={4}
-            value={item.description}
+            value={item.text}
             onChange={(e) =>
-              handleTitleChange(item.id, "description", e.target.value)
+              setTitles(
+                titles.map((t) =>
+                  t.id === item.id
+                    ? { ...t, text: e.target.value }
+                    : t
+                )
+              )
             }
           />
 
           <button
-            className="btn btn-primary"
-            onClick={() => handleTitleSave(item.id, item)}
+            className="btn btn-success me-2"
+            onClick={() => handleUpdateTitle(item)}
           >
-            Save
+            Update
+          </button>
+
+          <button
+            className="btn btn-danger"
+            onClick={() => handleDeleteTitle(item.id)}
+          >
+            Delete
           </button>
         </div>
       ))}
