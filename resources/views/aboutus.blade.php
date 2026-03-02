@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    @foreach ($allContactUs as $u)
+         <p>{{ $u->id }}</p>
+        <p>{{ $u->name }}</p>
+        <p>{{ $u->email }}</p>
+        <p>{{ $u->phone }}</p>
+        <p>{{ $u->message }}</p>
+    @endforeach
+</body>
+</html>

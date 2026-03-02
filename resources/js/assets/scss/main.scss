@@ -1,0 +1,41 @@
+/* ===============================
+   VARIABLES & MIXINS (FIRST!)
+================================ */
+@use "_variables" as *;
+@use "_mixins" as *;
+
+@use "_typography";
+
+@use "_buttons";
+@use "_animation";
+
+/* ===============================
+   LAYOUT / SECTIONS
+================================ */
+@use "_header";
+@use "_footer";
+@use "_hero";
+@use "_about";
+@use "_brand";
+@use "_cta";
+@use "_faq";
+@use "_feature";
+@use "_helping";
+@use "_marquee";
+@use "_meanmenu";
+@use "_news";
+@use "_pricing";
+@use "_preloader";
+@use "_project";
+@use "_section";
+@use "_service";
+@use "_team";
+@use "_testimonial";
+@use "_contact";
+
+/* ===============================
+   THIRD-PARTY CSS (ALLOWED)
+================================ */
+@import "bootstrap/dist/css/bootstrap.min.css";
+
+
