@@ -37,67 +37,86 @@ const AdminAbout = () => {
   const [loading, setLoading] = useState(true);
 
 
-  useEffect(() => {
-    Promise.all([
-      fetch(`${API_URL}/api/about`),
-      fetch(`${API_URL}/api/abouttitle`)
-    ])
-      .then(async ([mainRes, titlesRes]) => {
-        const mainData = await mainRes.json();
-        const titlesData = await titlesRes.json();
+ useEffect(() => {
+  Promise.all([
+    fetch(`${API_URL}/api/about`),
+    fetch(`${API_URL}/api/abouttitle`)
+  ])
+    .then(async ([mainRes, titlesRes]) => {
+      const mainData = await mainRes.json();
+      const titlesData = await titlesRes.json();
 
-        if (mainData.length > 0) {
-          setMain(mainData[0]);
-          setMainExists(true);
+      if (mainData.length > 0) {
+        const aboutItem = mainData[0];
+        setMain(aboutItem);
+        setMainExists(true);
+
+
+        if (aboutItem.image) {
+          const imageUrl = `${API_URL}/storage/${aboutItem.image}`;
+          const response = await fetch(imageUrl);
+          const blob = await response.blob();
+
+          const existingFile = new File(
+            [blob],
+            aboutItem.image.split("/").pop() || "image.jpg",
+            { type: blob.type }
+          );
+
+          setImageFile(existingFile); 
         }
+      }
 
-        setTitles(titlesData);
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
-  }, []);
-
+      setTitles(titlesData);
+      setLoading(false);
+    })
+    .catch(() => setLoading(false));
+}, []);
 
   const handleMainChange = (field: keyof MainAbout, value: string) => {
     setMain({ ...main, [field]: value });
   };
+const handleMainSubmit = async () => {
+  if (!imageFile) {
+    alert("Image is required ❌");
+    return;
+  }
 
-  const handleMainSubmit = async () => {
-    const formData = new FormData();
-    formData.append("header", main.header);
-    formData.append("header_description", main.header_description);
+  const formData = new FormData();
+  formData.append("header", main.header);
+  formData.append("header_description", main.header_description);
+  formData.append("image", imageFile);
 
-    if (imageFile) {
-      formData.append("image", imageFile);
+  if (mainExists) {
+    formData.append("_method", "PUT");
+  }
+
+  const url = mainExists
+    ? `${API_URL}/api/about/${main.id}`
+    : `${API_URL}/api/about`;
+
+  try {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: "application/json",
+      },
+      body: formData,
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      alert(JSON.stringify(data.errors));
+      return;
     }
 
-    try {
-      const url = mainExists
-        ? `${API_URL}/api/about/${main.id}`
-        : `${API_URL}/api/about`;
-
-      const method = mainExists ? "POST" : "POST";
-
-      if (mainExists) {
-        formData.append("_method", "PUT");
-      }
-
-      const res = await fetch(url, {
-        method,
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        body: formData,
-      });
-
-      if (!res.ok) throw new Error();
-
-      alert(mainExists ? "Updated ✅" : "Created ✅");
-  
-    } catch {
-      alert("Operation failed ❌");
-    }
-  };
+    alert(mainExists ? "Updated ✅" : "Created ✅");
+  } catch {
+    alert("Operation failed ❌");
+  }
+};
 
 
   const handleAddTitle = async () => {
@@ -107,6 +126,7 @@ const AdminAbout = () => {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
+            Accept: "application/json",
         },
         body: JSON.stringify(newTitle),
       });
@@ -129,6 +149,7 @@ const AdminAbout = () => {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
+              Accept: "application/json",
           },
           body: JSON.stringify(item),
         }
@@ -151,6 +172,7 @@ const AdminAbout = () => {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
+            Accept: "application/json",
         },
       });
 

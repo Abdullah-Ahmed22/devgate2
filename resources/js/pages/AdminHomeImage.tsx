@@ -7,8 +7,11 @@ interface HomeImageType {
 
 const AdminHomeImage = () => {
     const API_URL = import.meta.env.VITE_API_URL;
+
     const [items, setItems] = useState<HomeImageType[]>([]);
     const [image, setImage] = useState<File | null>(null);
+    const [errors, setErrors] = useState<Record<string, string[]>>({});
+    const [loading, setLoading] = useState(false);
 
     const token = localStorage.getItem("token");
 
@@ -25,58 +28,105 @@ const AdminHomeImage = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (!image) {
-            alert("Image is required");
+        if (!token) {
+            alert("You are not authenticated.");
             return;
         }
 
-        const formData = new FormData();
-        formData.append("image", image);
+        setErrors({});
+        setLoading(true);
 
-        const response = await fetch(`${API_URL}/api/homeimage`, {
-            method: "POST",
-            headers: {
-                Authorization: `Bearer ${token}`,
-                Accept: "application/json",
-            },
-            body: formData,
-        });
+        try {
+            const formData = new FormData();
 
-        if (!response.ok) {
-            alert("Error occurred");
-            return;
+            if (image instanceof File) {
+                formData.append("image", image);
+            }
+
+            const response = await fetch(`${API_URL}/api/homeimage`, {
+                method: "POST",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    Accept: "application/json",
+                },
+                body: formData,
+            });
+
+            const data = await response.json();
+
+            if (response.status === 422) {
+                setErrors(data.errors || {});
+                return;
+            }
+
+            if (!response.ok) {
+                alert(data.message || "Failed to upload image.");
+                return;
+            }
+
+            // ✅ Success
+            setImage(null);
+            fetchItems();
+        } catch (error) {
+            console.error(error);
+            alert("Network error.");
+        } finally {
+            setLoading(false);
         }
-
-        setImage(null);
-        fetchItems();
     };
 
     const handleDelete = async (id: number) => {
-        await fetch(`${API_URL}/api/homeimage/${id}`, {
-            method: "DELETE",
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        });
+        if (!token) return;
 
-        fetchItems();
+        try {
+            const response = await fetch(`${API_URL}/api/homeimage/${id}`, {
+                method: "DELETE",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    Accept: "application/json",
+                },
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                alert(data.message || "Failed to delete image.");
+                return;
+            }
+
+            fetchItems();
+        } catch (error) {
+            console.error(error);
+            alert("Something went wrong.");
+        }
     };
 
     return (
         <div className="container section-padding">
             <h2>Manage Home Images</h2>
 
-            {/* Upload Form */}
+
             <form onSubmit={handleSubmit} className="mb-4">
+
+
+                {errors.image && (
+                    <small className="text-danger d-block mb-2">
+                        {errors.image[0]}
+                    </small>
+                )}
+
                 <input
                     type="file"
+                    name="image"
                     className="form-control mb-3"
                     onChange={(e) =>
-                        setImage(e.target.files ? e.target.files[0] : null)
+                        setImage(e.target.files?.[0] || null)
                     }
                 />
 
-                <button className="btn btn-success">Upload Image</button>
+                <button className="btn btn-success" disabled={loading}>
+                    {loading ? "Uploading..." : "Upload Image"}
+                </button>
             </form>
 
             {/* Images List */}

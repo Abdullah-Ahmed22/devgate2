@@ -52,49 +52,25 @@ const AdminTestimonials = () => {
         }
     };
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-        if (!token) {
-            alert("You are not logged in.");
-            return;
-        }
+    const token = localStorage.getItem("token");
+    if (!token) {
+        alert("You are not authenticated.");
+        return;
+    }
 
-        setLoading(true);
-        setErrors({});
+    setLoading(true);
+    setErrors({});
 
-        // ✅ Frontend validation
-        const newErrors: Record<string, string[]> = {};
-
-        if (!form.description.trim()) {
-            newErrors.description = ["Description is required."];
-        }
-
-        if (!form.name.trim()) {
-            newErrors.name = ["Name is required."];
-        }
-
-        if (!form.position.trim()) {
-            newErrors.position = ["Position is required."];
-        }
-
-        // Image required only when creating
-        if (!editingId && !form.image) {
-            newErrors.image = ["Image is required."];
-        }
-
-        if (Object.keys(newErrors).length > 0) {
-            setErrors(newErrors);
-            setLoading(false);
-            return;
-        }
-
+    try {
         const formData = new FormData();
         formData.append("description", form.description);
         formData.append("name", form.name);
         formData.append("position", form.position);
 
-        if (form.image) {
+        if (form.image instanceof File) {
             formData.append("image", form.image);
         }
 
@@ -106,43 +82,45 @@ const AdminTestimonials = () => {
             ? `${API_URL}/api/teammates/${editingId}`
             : `${API_URL}/api/teammates`;
 
-        try {
-            const response = await fetch(url, {
-                method: "POST",
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    Accept: "application/json",
-                },
-                body: formData,
-            });
+        const response = await fetch(url, {
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${token}`,
+                Accept: "application/json",
+            },
+            body: formData,
+        });
 
-            const data = await response.json().catch(() => null);
+        const data = await response.json();
 
-            if (!response.ok) {
-                if (response.status === 422) {
-                    setErrors(data?.errors || {});
-                } else {
-                    alert("Something went wrong.");
-                }
-                return;
-            }
 
-            setEditingId(null);
-            setForm({
-                description: "",
-                name: "",
-                position: "",
-                image: null,
-            });
-
-            fetchItems();
-        } catch (error) {
-            console.error(error);
-            alert("Network error.");
-        } finally {
-            setLoading(false);
+        if (response.status === 422) {
+            setErrors(data.errors || {});
+            return;
         }
-    };
+
+        if (!response.ok) {
+            alert(data.message || "Server error.");
+            return;
+        }
+
+        // ✅ Success
+        setEditingId(null);
+        setForm({
+            description: "",
+            name: "",
+            position: "",
+            image: null,
+        });
+
+        fetchItems();
+    } catch (error) {
+        console.error(error);
+        alert("Network error.");
+    } finally {
+        setLoading(false);
+    }
+};
 
     const handleDelete = async (id: number) => {
         await fetch(`${API_URL}/api/teammates/${id}`, {
@@ -211,6 +189,7 @@ const AdminTestimonials = () => {
 
                 <input
                     type="file"
+                    name="image"
                     onChange={handleChange}
                     className="form-control mb-3"
                 />

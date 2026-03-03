@@ -48,7 +48,7 @@ export const menuData: MenuItemDataType[] = [
         submenu: [],
     },
     {
-        title: "Contact",
+        title: "Contact us",
         link: "/contact",
     },
 ];

@@ -54,7 +54,7 @@ const API_URL = import.meta.env.VITE_API_URL;
           <SectionTitle>
             <SectionTitle.SubTitle>Services We Offer</SectionTitle.SubTitle>
             <SectionTitle.Title>
-              <br /> Service
+              <br /> Services
             </SectionTitle.Title>
           </SectionTitle>
           <div className="array-button">

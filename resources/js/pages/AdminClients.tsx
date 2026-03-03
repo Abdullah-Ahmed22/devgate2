@@ -7,8 +7,11 @@ interface ClientType {
 
 const AdminClients = () => {
   const API_URL = import.meta.env.VITE_API_URL;
+
   const [clients, setClients] = useState<ClientType[]>([]);
   const [image, setImage] = useState<File | null>(null);
+  const [errors, setErrors] = useState<Record<string, string[]>>({});
+  const [loading, setLoading] = useState(false);
 
   const token = localStorage.getItem("token");
 
@@ -22,55 +25,107 @@ const AdminClients = () => {
     fetchClients();
   }, []);
 
-  const handleSubmit = async (e: any) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!image) return alert("Select image");
+    if (!token) {
+      alert("You are not authenticated.");
+      return;
+    }
 
-    const formData = new FormData();
-    formData.append("image", image);
+    setErrors({});
+    setLoading(true);
 
-    await fetch(`${API_URL}/api/ourclients`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        Accept: "application/json",
-      },
-      body: formData,
-    });
+    try {
+      const formData = new FormData();
 
-    setImage(null);
-    fetchClients();
+      if (image instanceof File) {
+        formData.append("image", image);
+      }
+
+      const response = await fetch(`${API_URL}/api/ourclients`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: "application/json",
+        },
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      // ✅ Validation errors
+      if (response.status === 422) {
+        setErrors(data.errors || {});
+        return;
+      }
+
+      // ❌ Other server errors
+      if (!response.ok) {
+        alert(data.message || "Failed to add client.");
+        return;
+      }
+
+      // ✅ Success
+      setImage(null);
+      fetchClients();
+    } catch (error) {
+      console.error(error);
+      alert("Network error.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleDelete = async (id: number) => {
     if (!window.confirm("Delete this client?")) return;
 
-    await fetch(`${API_URL}/api/ourclients/${id}`, {
-      method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        Accept: "application/json",
-      },
-    });
+    if (!token) return;
 
-    fetchClients();
+    try {
+      const response = await fetch(`${API_URL}/api/ourclients/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: "application/json",
+        },
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        alert(data.message || "Failed to delete client.");
+        return;
+      }
+
+      fetchClients();
+    } catch (error) {
+      console.error(error);
+      alert("Something went wrong.");
+    }
   };
 
   return (
     <div className="container section-padding">
       <h2>Manage Our Clients</h2>
 
-
       <form onSubmit={handleSubmit} className="mb-4">
+        {/* ✅ Image Validation Error */}
+        {errors.image && (
+          <small className="text-danger d-block mb-2">
+            {errors.image[0]}
+          </small>
+        )}
+
         <input
           type="file"
+          name="image"
           onChange={(e) => setImage(e.target.files?.[0] || null)}
           className="form-control mb-3"
         />
 
-        <button className="btn btn-success">
-          Add Client Logo
+        <button className="btn btn-success" disabled={loading}>
+          {loading ? "Saving..." : "Add Client Logo"}
         </button>
       </form>
 
@@ -78,7 +133,6 @@ const AdminClients = () => {
         {clients.map((client) => (
           <div key={client.id} className="col-md-3 mb-4 text-center">
             <div className="p-3 bg-white shadow rounded">
-
               <img
                 src={`${API_URL}/storage/${client.image}`}
                 alt="client"
@@ -92,7 +146,6 @@ const AdminClients = () => {
               >
                 Delete
               </button>
-
             </div>
           </div>
         ))}

@@ -118,7 +118,7 @@ const AboutOne = () => {
                                 </div>
 
                                 <div className="about-button mt-4">
-                                    <Link to="/about/3" className="theme-btn">
+                                    <Link to="/about/1" className="theme-btn">
                                         Explore More
                                     </Link>
                                 </div>

@@ -22,7 +22,7 @@ class AboutRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'image' => ['required', 'image', 'mimes:png,jpg,jpeg'],
+            'image' => ['required', 'image'],
             'header' => ['required', 'min:3'],
             'header_description' => ['required'],
         ];

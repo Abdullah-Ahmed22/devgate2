@@ -7,34 +7,24 @@ interface AboutItem {
   id: number;
   title: string;
   description: string;
-}
-
-interface MainContent {
-  text1: string;
-  text2: string;
-  text3: string;
+  text: string; // ✅ added
 }
 
 const AboutDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const API_URL = import.meta.env.VITE_API_URL;
+
   const [aboutItem, setAboutItem] = useState<AboutItem | null>(null);
-  const [main, setMain] = useState<MainContent | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [titlesRes, aboutRes] = await Promise.all([
-          fetch(`${API_URL}/api/abouttitle`),
-          fetch(`${API_URL}/api/about`)
-        ]);
+        const res = await fetch(`${API_URL}/api/abouttitle`);
+        const data: AboutItem[] = await res.json();
 
-        const titlesData: AboutItem[] = await titlesRes.json();
-        const aboutData = await aboutRes.json();
-
-        const foundItem = titlesData.find(
+        const foundItem = data.find(
           (item) => item.id === Number(id)
         );
 
@@ -44,7 +34,6 @@ const AboutDetails: React.FC = () => {
         }
 
         setAboutItem(foundItem);
-        setMain(aboutData[0]);
       } catch (err) {
         setError("Server error");
       } finally {
@@ -54,15 +43,6 @@ const AboutDetails: React.FC = () => {
 
     if (id) fetchData();
   }, [id]);
-
-  // Decide which extra text to show
-  const getExtraText = () => {
-    if (!main || !aboutItem) return "";
-
-    if (aboutItem.id === 1) return main.text1;
-    if (aboutItem.id === 3) return main.text2;
-    return main.text3;
-  };
 
   return (
     <>
@@ -101,9 +81,9 @@ const AboutDetails: React.FC = () => {
                         {aboutItem.description}
                       </p>
 
-                      {/* Extra Dynamic Text */}
+           
                       <p className="mt-4">
-                        {getExtraText()}
+                        {aboutItem.text}
                       </p>
                     </>
                   )}

@@ -22,7 +22,7 @@ class HomeImageRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'image' => 'nullable|image|mimes:jpg,jpeg,png,webp',
+            'image' => 'required|image|mimes:jpg,jpeg,png,webp',
         ];
     }
 

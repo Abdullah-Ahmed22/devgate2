@@ -38,7 +38,7 @@ const AdminServices = () => {
 
     return (
         <>
-            <DashTitle currentPage="Projects" title="Projects"/>
+            <DashTitle currentPage="Services" title="Services"/>
 
         <div className="container section-padding">
             <h2>Manage Services</h2>
