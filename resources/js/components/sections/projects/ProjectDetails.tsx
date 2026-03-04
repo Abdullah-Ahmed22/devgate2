@@ -5,7 +5,7 @@ import PageTitle from "../pageTitle";
 
 const ProjectDetails = () => {
     const { id } = useParams();
-        const API_URL = import.meta.env.VITE_API_URL;
+    const API_URL = import.meta.env.VITE_API_URL;
 
     const [project, setProject] = useState<ProjectType | null>(null);
     const [loading, setLoading] = useState(true);
@@ -20,9 +20,7 @@ const ProjectDetails = () => {
 
         const fetchProject = async () => {
             try {
-                const response = await fetch(
-                    `${API_URL}/api/projects/${id}`,
-                );
+                const response = await fetch(`${API_URL}/api/projects/${id}`);
 
                 const result = await response.json();
 
@@ -93,21 +91,45 @@ const ProjectDetails = () => {
                                         <img
                                             src={`${API_URL}/storage/${project.image1}`}
                                             alt="project"
-                                             className="project-image"
+                                            className="project-image"
                                         />
                                     </div>
                                 )}
 
                                 {project.text1 && (
-                                    <p className="mb-3">{project.text1}</p>
+                                    <p
+                                        className="mb-3"
+                                        style={{
+                                            whiteSpace: "pre-line",
+                                            textAlign: "left",
+                                        }}
+                                    >
+                                        {project.text1}
+                                    </p>
                                 )}
 
                                 {project.text2 && (
-                                    <p className="mb-3">{project.text2}</p>
+                                    <p
+                                        className="mb-3"
+                                        style={{
+                                            whiteSpace: "pre-line",
+                                            textAlign: "left",
+                                        }}
+                                    >
+                                        {project.text2}
+                                    </p>
                                 )}
 
                                 {project.text3 && (
-                                    <p className="mb-3">{project.text3}</p>
+                                    <p
+                                        className="mb-3"
+                                        style={{
+                                            whiteSpace: "pre-line",
+                                            textAlign: "left",
+                                        }}
+                                    >
+                                        {project.text3}
+                                    </p>
                                 )}
 
                                 {project.image2 && (
@@ -115,9 +137,7 @@ const ProjectDetails = () => {
                                         <img
                                             src={`${API_URL}/storage/${project.image2}`}
                                             alt="project"
-                                               className="project-image"
-                                              
-
+                                            className="project-image"
                                         />
                                     </div>
                                 )}
