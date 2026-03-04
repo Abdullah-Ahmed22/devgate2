@@ -22,7 +22,7 @@ class AboutRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'image' => ['required', 'image'],
+            'image' => ['required', 'image', 'mimes:png,jpg,jpeg,webp'],
             'header' => ['required', 'min:3'],
             'header_description' => ['required'],
         ];
@@ -33,7 +33,7 @@ class AboutRequest extends FormRequest
         return [
             'image.required' => 'Image is required.',
             'image.image' => 'The uploaded file must be a valid image.',
-            'image.mimes' => 'The image must be a file of type: png, jpg, jpeg.',
+            'image.mimes' => 'The image must be a file of type: png, jpg, jpeg, webp.',
 
             'header.required' => 'Header is required.',
             'header.min' => 'Header must be at least 3 characters.',

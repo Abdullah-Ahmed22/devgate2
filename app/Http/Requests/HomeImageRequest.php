@@ -30,7 +30,7 @@ class HomeImageRequest extends FormRequest
     {
         return[
             'image.image' => 'Image must be a valid image file.',
-            'image.mimes' => 'Image must be a PNG or JPG file.',
+            'image.mimes' => 'The image must be a file of type: png, jpg, jpeg, webp.',
         ];
 
     }
