@@ -7,8 +7,7 @@ interface AboutItem {
   id: number;
   title: string;
   description: string;
-  text: string; // ✅ added
-}
+  text: string; }
 
 const AboutDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -77,9 +76,7 @@ const AboutDetails: React.FC = () => {
                         </SectionTitle.Title>
                       </SectionTitle>
 
-                      <p className="mt-4">
-                        {aboutItem.description}
-                      </p>
+                     
 
            
                       <p className="mt-4">
