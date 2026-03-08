@@ -12,15 +12,14 @@ class ProjectController extends Controller
 {
      public function index(){ // Return all projects from database
 
-        $allProjects = Project::get();
+        $allProjects = Project::with('types')->get();
 
         return response()->json($allProjects);
     }
 
     public function show($id){ // Return specific projects from database
 
-        $specificProject = Project::findorfail($id);
-
+       $specificProject = Project::with('types')->findorfail($id);
         return response()->json($specificProject);
     }
 
@@ -43,10 +42,12 @@ class ProjectController extends Controller
             $path3 = $request->file('image3')->store("projectImages");
             $data['image3'] = $path3;
         }
+       $project = Project::create($data);
+       if($request->has('types')){
+       $project->types()->attach($request->types);
+}
 
-        Project::create($data);
-
-        return response()->json(['message' => 'Project added successfully'], 201);
+return response()->json(['message' => 'Project added successfully'], 201);
     }
 
     public function edit($id){
@@ -89,6 +90,9 @@ class ProjectController extends Controller
         }
 
         $updateSpecificProject->update($data);
+        if($request->has('types')){
+        $updateSpecificProject->types()->sync($request->types);
+}
 
         return response()->json(['message' => 'Project updated successfully'], 200);
     }

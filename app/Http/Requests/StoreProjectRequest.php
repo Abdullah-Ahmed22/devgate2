@@ -25,7 +25,7 @@ class StoreProjectRequest extends FormRequest
     {
         return [
             'title'       => 'required|string|max:255',
-            
+
             'text1'       => 'required|string',
             'text2'       => 'nullable|string',
             'text3'       => 'nullable|string',
@@ -33,6 +33,11 @@ class StoreProjectRequest extends FormRequest
             'image1'      => 'required|image|mimes:jpg,jpeg,png,webp',
             'image2'      => 'nullable|image|mimes:jpg,jpeg,png,webp',
             'image3'      => 'nullable|image|mimes:jpg,jpeg,png,webp',
+
+            'types'       => 'nullable|array',
+            'types.*'     => 'exists:types,id',
+
+
         ];
     }
 
@@ -45,16 +50,19 @@ class StoreProjectRequest extends FormRequest
             'title.required' => 'Title is required.',
 
             'text1.required' => 'Text1 is required.',
-          
+
             'image1.image' => 'Image 1 must be a valid image file.',
             'image1.mimes' => 'Image 1 must be a JPG, JPEG, PNG, or WEBP file.',
             'image1.required' => 'Image 1 is required.',
 
             'image2.image' => 'Image 2 must be a valid image file.',
             'image2.mimes' => 'Image 2 must be a JPG, JPEG, PNG, or WEBP file.',
-            
+
             'image3.image' => 'Image 3 must be a valid image file.',
             'image3.mimes' => 'Image 3 must be a JPG, JPEG, PNG, or WEBP file.',
+
+            'types.array' => 'Types must be an array.',
+            'types.*.exists' => 'One or more selected types are invalid.',
         ];
     }
 }

@@ -23,7 +23,7 @@ class UpdateProjectRequest extends FormRequest
     {
         // $id = $this->route('id');
         return [
-            
+
             'title'       => 'nullable|string|max:255',
             'text1'       => 'nullable|string',
             'text2'       => 'nullable|string',
@@ -32,6 +32,9 @@ class UpdateProjectRequest extends FormRequest
             'image1'      => 'nullable|image|mimes:jpg,jpeg,png,webp',
             'image2'      => 'nullable|image|mimes:jpg,jpeg,png,webp',
             'image3'      => 'nullable|image|mimes:jpg,jpeg,png,webp',
+
+            'types'       => 'nullable|array',
+            'types.*'     => 'exists:types,id',
         ];
     }
 
@@ -48,6 +51,9 @@ class UpdateProjectRequest extends FormRequest
 
             'image3.image' => 'Image3 must be a valid image file.',
             'image3.mimes' => 'Image3 must be a JPG, JPEG, PNG, or WEBP file.',
+
+            'types.array' => 'Types must be an array.',
+            'types.*.exists' => 'One or more selected types are invalid.',
         ];
 
     }

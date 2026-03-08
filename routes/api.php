@@ -12,6 +12,7 @@ use App\Http\Controllers\TeammateController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\OurClientController;
 use App\Http\Controllers\StatisticController;
+use App\Http\Controllers\TypeController;
 
 Route::post('/admin/login', [AdminAuthController::class, 'login']);
 
@@ -29,7 +30,7 @@ Route::get('/projects/{id}', [ProjectController::class, 'show']);
 Route::get('/abouttitle',[AboutTitleController::class, 'index'])->name('index');
 
 Route::get('/about',[AboutController::class, 'index'])->name('index');
-    
+
 Route::get('/services', [ServiceController::class, 'index']);
 Route::get('/services/{id}', [ServiceController::class, 'show']);
 
@@ -75,7 +76,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/projects', [ProjectController::class, 'store'])->name('store');
     Route::delete('/projects/{id}', [ProjectController::class, 'destroy'])->where(['id' => '[0-9]+'])->name('destroy');
     Route::get('/projects/{id}/edit', [ProjectController::class, 'edit'])->where(['id' => '[0-9]+'])->name('edit');
-    Route::put('/projects/{id}', [ProjectController::class, 'update'])->where(['id' => '[0-9]+'])->name('update');
+ Route::put('/projects/{id}', [ProjectController::class, 'update'])->where(['id' => '[0-9]+'])->name('update');
+
+ Route::get('/types', [TypeController::class, 'index']);
+Route::get('/types/{id}', [TypeController::class, 'show']);
+Route::post('/types', [TypeController::class, 'store']);
+
+Route::put('/types/{id}', [TypeController::class, 'update']);
+Route::delete('/types/{id}', [TypeController::class, 'destroy']);
 
     Route::post('/abouttitle', [AboutTitleController::class, 'store'])->name('store');
     Route::put('/abouttitle/{id}', [AboutTitleController::class, 'update'])->where(['id' => '[0-9]+'])->name('update');
