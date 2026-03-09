@@ -3,130 +3,155 @@ import { Link } from "react-router-dom";
 import { menuData, MenuItemDataType } from "@/db/menuData";
 
 interface ApiItem {
-  id: number;
-  title: string;
+    id: number;
+    title: string;
 }
 
 function Navbar() {
-  const API_URL = import.meta.env.VITE_API_URL;
-  const [dynamicMenu, setDynamicMenu] =
-    useState<MenuItemDataType[]>(menuData);
+    const API_URL = import.meta.env.VITE_API_URL;
+    const [dynamicMenu, setDynamicMenu] =
+        useState<MenuItemDataType[]>(menuData);
 
-  useEffect(() => {
-    const fetchMenus = async () => {
-      try {
-        const [
-       
-          projectRes,
-          serviceRes,
-          aboutRes
-        ] = await Promise.all([
-   
-          fetch(`${API_URL}/api/projects`),
-          fetch(`${API_URL}/api/services`),
-          fetch(`${API_URL}/api/abouttitle`),
-        ]);
+    useEffect(() => {
+        const fetchMenus = async () => {
+            try {
+                const [typeRes, serviceRes, aboutRes] = await Promise.all([
+                    fetch(`${API_URL}/api/projects`),
+                    fetch(`${API_URL}/api/services`),
+                    fetch(`${API_URL}/api/abouttitle`),
+                ]);
 
+                const typeJson = await typeRes.json();
+                const serviceJson = await serviceRes.json();
+                const aboutJson = await aboutRes.json();
 
-        const projectJson = await projectRes.json();
-        const serviceJson = await serviceRes.json();
-        const aboutJson = await aboutRes.json();
+                const types = typeJson.data || typeJson || [];
+               console.log(types)
+                const services = serviceJson.data || serviceJson || [];
+                const about = aboutJson.data || aboutJson || [];
 
-   
-        const projects: ApiItem[] =
-          projectJson.data || projectJson || [];
-        const services: ApiItem[] =
-          serviceJson.data || serviceJson || [];
-        const about: ApiItem[] =
-          aboutJson.data || aboutJson || [];
+                const updatedMenu = menuData.map((menu) => {
+                    switch (menu.title.toLowerCase()) {
+                       case "projects": {
 
-        const buildSubmenu = (
-          items: ApiItem[],
-          basePath: string
-        ) =>
-          items.map((item) => ({
-            title: item.title,
-            link: `/${basePath}/${item.id}`,
-          }));
+    const typeMap: Record<string, any[]> = {};
 
-        const updatedMenu = menuData.map((menu) => {
-          switch (menu.title.toLowerCase()) {
-           
+    types.forEach((project: any) => {
 
-            case "projects":
-              return {
-                ...menu,
-                submenu: buildSubmenu(
-                  projects,
-                  "projects"
-                ),
-              };
+        if (!project.types?.length) {
+            if (!typeMap["Other"]) typeMap["Other"] = [];
+            typeMap["Other"].push(project);
+        }
 
-            case "services":
-              return {
-                ...menu,
-                submenu: buildSubmenu(
-                  services,
-                  "services"
-                ),
-              };
+        project.types.forEach((type: any) => {
 
-            case "about":
-              return {
-                ...menu,
-                submenu: buildSubmenu(
-                  about,
-                  "about"
-                ),
-              };
+            const typeName = type.project_type;
 
-            default:
-              return menu;
-          }
+            if (!typeMap[typeName]) {
+                typeMap[typeName] = [];
+            }
+
+            typeMap[typeName].push(project);
+
         });
 
-        setDynamicMenu(updatedMenu);
-      } catch (error) {
-        console.error("Navbar fetch error:", error);
-      }
+    });
+
+    const projectMenu = Object.entries(typeMap).map(([typeName, projects]) => ({
+        title: typeName,
+        link: "#",
+        submenu: projects.map((project: any) => ({
+            title: project.title,
+            link: `/projects/${project.id}`,
+        })),
+    }));
+
+    return {
+        ...menu,
+        submenu: projectMenu,
     };
+}
 
-    fetchMenus();
-  }, []);
+                        case "services":
+                            return {
+                                ...menu,
+                                submenu: services.map((service: any) => ({
+                                    title: service.title,
+                                    link: `/services/${service.id}`,
+                                })),
+                            };
 
-  return (
-    <ul>
-      {dynamicMenu.map(
-        ({ link, title, megamenu, submenu }, index) => (
-          <li
-            key={index}
-            className={`${
-              submenu?.length ? "has-dropdown" : ""
-            }`}
-          >
-            <Link to={link}>
-              {title}{" "}
-              {(submenu?.length || megamenu) && (
-                <i className="fas fa-angle-down" />
-              )}
-            </Link>
+                        case "about":
+                            return {
+                                ...menu,
+                                submenu: about.map((item: any) => ({
+                                    title: item.title,
+                                    link: `/about/${item.id}`,
+                                })),
+                            };
 
-            {submenu?.length && (
-              <ul className="submenu">
-                {submenu.map((dropdown, ind) => (
-                  <li key={ind}>
-                    <Link to={dropdown.link}>
-                      {dropdown.title}
+                        default:
+                            return menu;
+                    }
+                });
+
+                setDynamicMenu(updatedMenu);
+            } catch (error) {
+                console.error("Navbar fetch error:", error);
+            }
+        };
+
+        fetchMenus();
+    }, []);
+
+    return (
+        <ul>
+            {dynamicMenu.map(({ link, title, submenu }, index) => (
+                <li
+                    key={index}
+                    className={`${submenu?.length ? "has-dropdown" : ""}`}
+                >
+                    <Link to={link}>
+                        {title}{" "}
+                        {(submenu?.length ) && (
+                            <i className="fas fa-angle-down" />
+                        )}
                     </Link>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </li>
-        )
-      )}
-    </ul>
-  );
+
+                    {submenu?.length && (
+                        <ul className="submenu">
+                            {submenu.map((dropdown, ind) => (
+                                <li
+                                    key={ind}
+                                    className={
+                                        dropdown.submenu?.length
+                                            ? "has-dropdown"
+                                            : ""
+                                    }
+                                >
+                                    <Link to={dropdown.link}>
+                                        {dropdown.title}
+                                    </Link>
+
+                                    {dropdown.submenu && (
+                                        <ul className="submenu">
+                                            {dropdown.submenu.map((sub, i) => (
+                                                <li key={i}>
+                                                    <Link to={sub.link}>
+                                                        {sub.title}
+                                                    </Link>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    )}
+                                </li>
+                            ))}
+                        </ul>
+                    )}
+                </li>
+            ))}
+        </ul>
+    );
 }
 
 export default Navbar;

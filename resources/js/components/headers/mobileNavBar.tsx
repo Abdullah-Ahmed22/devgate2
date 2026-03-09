@@ -23,66 +23,94 @@ const MobileNavBar = () => {
         );
     };
 
-   useEffect(() => {
-    const fetchMenus = async () => {
-        try {
-            const [
-                projectRes,
-                serviceRes,
-                aboutRes
-            ] = await Promise.all([
-                fetch(`${API_URL}/api/projects`),
-                fetch(`${API_URL}/api/services`),
-                fetch(`${API_URL}/api/abouttitle`),
-            ]);
+    useEffect(() => {
+        const fetchMenus = async () => {
+            try {
+                const [projectRes, serviceRes, aboutRes] = await Promise.all([
+                    fetch(`${API_URL}/api/projects`),
+                    fetch(`${API_URL}/api/services`),
+                    fetch(`${API_URL}/api/abouttitle`),
+                ]);
 
-            const projectJson = await projectRes.json();
-            const serviceJson = await serviceRes.json();
-            const aboutJson = await aboutRes.json();
+                const projectJson = await projectRes.json();
+                const serviceJson = await serviceRes.json();
+                const aboutJson = await aboutRes.json();
 
-            const projects = projectJson.data || projectJson || [];
-            const services = serviceJson.data || serviceJson || [];
-            const about = aboutJson.data || aboutJson || [];
+                const projects = projectJson.data || projectJson || [];
+                const services = serviceJson.data || serviceJson || [];
+                const about = aboutJson.data || aboutJson || [];
 
-            const buildSubmenu = (items: any[], basePath: string) =>
-                items.map((item) => ({
-                    title: item.title,
-                    link: `/${basePath}/${item.id}`,
-                }));
+                const buildSubmenu = (items: any[], basePath: string) =>
+                    items.map((item) => ({
+                        title: item.title,
+                        link: `/${basePath}/${item.id}`,
+                    }));
 
-            const updatedMenu = menuData.map((menu) => {
-                switch (menu.title.toLowerCase()) {
-                    case "projects":
-                        return {
-                            ...menu,
-                            submenu: buildSubmenu(projects, "projects"),
-                        };
+                const updatedMenu = menuData.map((menu) => {
+                    switch (menu.title.toLowerCase()) {
+                        case "projects": {
+                            const typeMap: Record<string, any[]> = {};
 
-                    case "services":
-                        return {
-                            ...menu,
-                            submenu: buildSubmenu(services, "services"),
-                        };
+                            projects.forEach((project: any) => {
+                                if (!project.types?.length) {
+                                    if (!typeMap["Other"])
+                                        typeMap["Other"] = [];
+                                    typeMap["Other"].push(project);
+                                }
 
-                    case "about":
-                        return {
-                            ...menu,
-                            submenu: buildSubmenu(about, "about"),
-                        };
+                                project.types.forEach((type: any) => {
+                                    const typeName = type.project_type;
 
-                    default:
-                        return menu;
-                }
-            });
+                                    if (!typeMap[typeName]) {
+                                        typeMap[typeName] = [];
+                                    }
 
-            setDynamicMenu(updatedMenu);
-        } catch (error) {
-            console.error("Mobile menu fetch error:", error);
-        }
-    };
+                                    typeMap[typeName].push(project);
+                                });
+                            });
 
-    fetchMenus();
-}, []);
+                            const projectMenu = Object.entries(typeMap).map(
+                                ([typeName, items]) => ({
+                                    title: typeName,
+                                    link: "#",
+                                    submenu: items.map((project: any) => ({
+                                        title: project.title,
+                                        link: `/projects/${project.id}`,
+                                    })),
+                                }),
+                            );
+
+                            return {
+                                ...menu,
+                                submenu: projectMenu,
+                            };
+                        }
+
+                        case "services":
+                            return {
+                                ...menu,
+                                submenu: buildSubmenu(services, "services"),
+                            };
+
+                        case "about":
+                            return {
+                                ...menu,
+                                submenu: buildSubmenu(about, "about"),
+                            };
+
+                        default:
+                            return menu;
+                    }
+                });
+
+                setDynamicMenu(updatedMenu);
+            } catch (error) {
+                console.error("Mobile menu fetch error:", error);
+            }
+        };
+
+        fetchMenus();
+    }, []);
 
     return (
         <div className="mobile-menu d-lg-none">
@@ -117,25 +145,13 @@ const MenuItem = ({
         <div className="menu-item">
             <Link to={item.link}>
                 {item.title}
-                {(item.megamenu?.length || item.submenu?.length) && (
+                {item.submenu?.length && (
                     <i onClick={(e) => toggleSubmenu(e, index)}>+</i>
                 )}
             </Link>
 
-            {item.megamenu?.length && (
-                <MegaMenu
-                    megamenu={item.megamenu}
-                    isOpen={isOpen}
-                    index={index}
-                />
-            )}
-
             {item.submenu?.length && (
-                <Submenu
-                    submenu={item.submenu}
-                    isOpen={isOpen}
-                    index={index}
-                />
+                <Submenu submenu={item.submenu} isOpen={isOpen} index={index} />
             )}
         </div>
     );
@@ -162,7 +178,11 @@ const MegaMenu = ({
                         <img src={image} alt={title} />
                         <div className="demo-button">
                             {links.map(({ link, title }) => (
-                                <Link key={link} to={link} className="theme-btn">
+                                <Link
+                                    key={link}
+                                    to={link}
+                                    className="theme-btn"
+                                >
                                     <span>{title}</span>
                                 </Link>
                             ))}

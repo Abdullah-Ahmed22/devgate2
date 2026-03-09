@@ -1,6 +1,7 @@
-type MenuLink = {
+export type MenuLink = {
     title: string;
     link: string;
+    submenu?: MenuLink[];
 };
 
 export type MegaMenuDataType = {
@@ -18,7 +19,6 @@ export type SubMenuDataType = {
 export type MenuItemDataType = {
     title: string;
     link: string;
-    megamenu?: MegaMenuDataType[];
     submenu?: MenuLink[];
 };
 
@@ -34,6 +34,11 @@ export const menuData: MenuItemDataType[] = [
          
         ],
     },
+     {
+        title: "projects",
+        link: "#",
+        submenu: [],
+    },
 
     
     {
@@ -42,11 +47,7 @@ export const menuData: MenuItemDataType[] = [
         submenu: [],
     },
 
-    {
-        title: "projects",
-        link: "#",
-        submenu: [],
-    },
+   
     {
         title: "Contact us",
         link: "/contact",

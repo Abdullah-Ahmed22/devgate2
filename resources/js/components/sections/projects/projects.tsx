@@ -19,6 +19,7 @@ export interface ProjectType {
     text1: string;
     text2: string;
     text3: string;
+    types?: any[];
 }
 
 export default function Projects() {

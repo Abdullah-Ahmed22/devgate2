@@ -15,6 +15,7 @@ use App\Http\Controllers\StatisticController;
 use App\Http\Controllers\TypeController;
 
 Route::post('/admin/login', [AdminAuthController::class, 'login']);
+ Route::get('/types', [TypeController::class, 'index']);
 
 Route::get('/homeimage',[HomeImageController::class, 'index'])->name('index');
 
@@ -78,7 +79,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/projects/{id}/edit', [ProjectController::class, 'edit'])->where(['id' => '[0-9]+'])->name('edit');
  Route::put('/projects/{id}', [ProjectController::class, 'update'])->where(['id' => '[0-9]+'])->name('update');
 
- Route::get('/types', [TypeController::class, 'index']);
 Route::get('/types/{id}', [TypeController::class, 'show']);
 Route::post('/types', [TypeController::class, 'store']);
 

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 const AddProject = () => {
@@ -7,6 +7,9 @@ const AddProject = () => {
 
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState<Record<string, string[]>>({});
+
+    const [types, setTypes] = useState<any[]>([]);
+    const [selectedTypes, setSelectedTypes] = useState<number[]>([]);
 
     const [form, setForm] = useState({
         title: "",
@@ -17,6 +20,28 @@ const AddProject = () => {
         image2: null as File | null,
         image3: null as File | null,
     });
+
+    useEffect(() => {
+        fetchTypes();
+    }, []);
+
+    const fetchTypes = async () => {
+        try {
+            const res = await fetch(`${API_URL}/api/types`);
+            const data = await res.json();
+            setTypes(data);
+        } catch (error) {
+            console.error("Failed to fetch types:", error);
+        }
+    };
+
+    const toggleType = (id: number) => {
+        setSelectedTypes((prev) =>
+            prev.includes(id)
+                ? prev.filter((t) => t !== id)
+                : [...prev, id],
+        );
+    };
 
     const handleChange = (
         e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -44,6 +69,7 @@ const AddProject = () => {
         e.preventDefault();
 
         const token = localStorage.getItem("token");
+
         if (!token) {
             alert("You are not authenticated.");
             return;
@@ -68,6 +94,11 @@ const AddProject = () => {
 
             if (form.image3 instanceof File)
                 formData.append("image3", form.image3);
+
+            // send types[]
+            selectedTypes.forEach((id) => {
+                formData.append("types[]", String(id));
+            });
 
             const response = await fetch(`${API_URL}/api/projects`, {
                 method: "POST",
@@ -103,6 +134,7 @@ const AddProject = () => {
             <h2>Add Project</h2>
 
             <form onSubmit={handleSubmit}>
+
                 {errors.title && (
                     <small className="text-danger">{errors.title[0]}</small>
                 )}
@@ -125,10 +157,10 @@ const AddProject = () => {
                     onChange={handleChange}
                     className="form-control mb-2"
                 />
+
                 {errors.text2 && (
                     <small className="text-danger">{errors.text2[0]}</small>
                 )}
-
                 <textarea
                     name="text2"
                     placeholder="Text 2"
@@ -147,16 +179,17 @@ const AddProject = () => {
                     onChange={handleChange}
                     className="form-control mb-2"
                 />
+
                 {errors.image1 && (
                     <small className="text-danger">{errors.image1[0]}</small>
                 )}
-
                 <input
                     type="file"
                     name="image1"
                     onChange={handleChange}
                     className="form-control mb-2"
                 />
+
                 {errors.image2 && (
                     <small className="text-danger">{errors.image2[0]}</small>
                 )}
@@ -166,10 +199,10 @@ const AddProject = () => {
                     onChange={handleChange}
                     className="form-control mb-2"
                 />
+
                 {errors.image3 && (
                     <small className="text-danger">{errors.image3[0]}</small>
                 )}
-
                 <input
                     type="file"
                     name="image3"
@@ -177,9 +210,39 @@ const AddProject = () => {
                     className="form-control mb-3"
                 />
 
+                {/* TYPES CHECKBOX */}
+
+                <div className="mb-3">
+                    <label className="form-label">Project Types</label>
+
+                    {types.map((type) => (
+                        <div key={type.id} className="form-check">
+
+                            <input
+                                type="checkbox"
+                                className="form-check-input"
+                                checked={selectedTypes.includes(type.id)}
+                                onChange={() => toggleType(type.id)}
+                            />
+
+                            <label className="form-check-label">
+                                {type.project_type}
+                            </label>
+
+                        </div>
+                    ))}
+
+                    {errors.types && (
+                        <small className="text-danger">
+                            {errors.types[0]}
+                        </small>
+                    )}
+                </div>
+
                 <button className="btn btn-success" disabled={loading}>
                     {loading ? "Saving..." : "Save Project"}
                 </button>
+
             </form>
         </div>
     );

@@ -22,6 +22,7 @@ import Admins from "@/pages/Admins";
 import ContactAdminPage from "@/pages/ContactAdminPage";
 import AdminHomeImage from "@/pages/AdminHomeImage";
 import Careers from "@/pages/Careers";
+import AdminTypes from "@/pages/AdminTypes";
 export const router = createBrowserRouter([
     {
         path: "/",
@@ -75,6 +76,10 @@ export const router = createBrowserRouter([
             {
                 path: "/dashboard/testimonials",
                 element: <AdminTestimonials />,
+            },
+            {
+                path: "/dashboard/edittypes",
+                element: <AdminTypes />,
             },
             {
                 path: "/about/:id",

@@ -28,6 +28,7 @@ const Dashboard: React.FC = () => {
     { title: "Home images", link: "/dashboard/editimg" },
     { title: "About Us", link: "/dashboard/about" },
     { title: "Projects", link: "/dashboard/projects" },
+     { title: "Add Project Types", link: "/dashboard/edittypes" },
     { title: "Services", link: "/dashboard/services" },
     { title: "Statistics", link: "/dashboard/statistics" },
     { title: "Our Clients", link: "/dashboard/clients" },
