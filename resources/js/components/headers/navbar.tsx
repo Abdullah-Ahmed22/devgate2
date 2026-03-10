@@ -26,51 +26,49 @@ function Navbar() {
                 const aboutJson = await aboutRes.json();
 
                 const types = typeJson.data || typeJson || [];
-               console.log(types)
+                console.log(types);
                 const services = serviceJson.data || serviceJson || [];
                 const about = aboutJson.data || aboutJson || [];
 
                 const updatedMenu = menuData.map((menu) => {
                     switch (menu.title.toLowerCase()) {
-                       case "projects": {
+                        case "projects": {
+                            const typeMap: Record<string, any[]> = {};
 
-    const typeMap: Record<string, any[]> = {};
+                            types.forEach((project: any) => {
+                                if (!project.types?.length) {
+                                    if (!typeMap["Other"])
+                                        typeMap["Other"] = [];
+                                    typeMap["Other"].push(project);
+                                }
 
-    types.forEach((project: any) => {
+                                project.types.forEach((type: any) => {
+                                    const typeName = type.project_type;
 
-        if (!project.types?.length) {
-            if (!typeMap["Other"]) typeMap["Other"] = [];
-            typeMap["Other"].push(project);
-        }
+                                    if (!typeMap[typeName]) {
+                                        typeMap[typeName] = [];
+                                    }
 
-        project.types.forEach((type: any) => {
+                                    typeMap[typeName].push(project);
+                                });
+                            });
 
-            const typeName = type.project_type;
+                            const projectMenu = Object.entries(typeMap).map(
+                                ([typeName, projects]) => ({
+                                    title: typeName,
+                                    link: "#",
+                                    submenu: projects.map((project: any) => ({
+                                        title: project.title,
+                                        link: `/projects/${project.id}`,
+                                    })),
+                                }),
+                            );
 
-            if (!typeMap[typeName]) {
-                typeMap[typeName] = [];
-            }
-
-            typeMap[typeName].push(project);
-
-        });
-
-    });
-
-    const projectMenu = Object.entries(typeMap).map(([typeName, projects]) => ({
-        title: typeName,
-        link: "#",
-        submenu: projects.map((project: any) => ({
-            title: project.title,
-            link: `/projects/${project.id}`,
-        })),
-    }));
-
-    return {
-        ...menu,
-        submenu: projectMenu,
-    };
-}
+                            return {
+                                ...menu,
+                                submenu: projectMenu,
+                            };
+                        }
 
                         case "services":
                             return {
@@ -108,14 +106,13 @@ function Navbar() {
         <ul>
             {dynamicMenu.map(({ link, title, submenu }, index) => (
                 <li
+                   
                     key={index}
                     className={`${submenu?.length ? "has-dropdown" : ""}`}
                 >
                     <Link to={link}>
                         {title}{" "}
-                        {(submenu?.length ) && (
-                            <i className="fas fa-angle-down" />
-                        )}
+                        {submenu?.length && <i className="fas fa-angle-down" />}
                     </Link>
 
                     {submenu?.length && (
