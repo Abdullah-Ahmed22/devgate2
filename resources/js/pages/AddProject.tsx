@@ -37,9 +37,7 @@ const AddProject = () => {
 
     const toggleType = (id: number) => {
         setSelectedTypes((prev) =>
-            prev.includes(id)
-                ? prev.filter((t) => t !== id)
-                : [...prev, id],
+            prev.includes(id) ? prev.filter((t) => t !== id) : [...prev, id],
         );
     };
 
@@ -72,6 +70,13 @@ const AddProject = () => {
 
         if (!token) {
             alert("You are not authenticated.");
+            return;
+        }
+
+        if (selectedTypes.length === 0) {
+            setErrors({
+                types: ["Please select at least one project type."],
+            });
             return;
         }
 
@@ -134,7 +139,6 @@ const AddProject = () => {
             <h2>Add Project</h2>
 
             <form onSubmit={handleSubmit}>
-
                 {errors.title && (
                     <small className="text-danger">{errors.title[0]}</small>
                 )}
@@ -211,13 +215,17 @@ const AddProject = () => {
                 />
 
                 {/* TYPES CHECKBOX */}
-
+{errors.types && (
+                                <small className="text-danger">
+                                    {errors.types[0]}
+                                </small>
+                            )}
                 <div className="mb-3">
                     <label className="form-label">Project Types</label>
 
                     {types.map((type) => (
                         <div key={type.id} className="form-check">
-
+                            
                             <input
                                 type="checkbox"
                                 className="form-check-input"
@@ -228,21 +236,13 @@ const AddProject = () => {
                             <label className="form-check-label">
                                 {type.project_type}
                             </label>
-
                         </div>
                     ))}
-
-                    {errors.types && (
-                        <small className="text-danger">
-                            {errors.types[0]}
-                        </small>
-                    )}
                 </div>
 
                 <button className="btn btn-success" disabled={loading}>
                     {loading ? "Saving..." : "Save Project"}
                 </button>
-
             </form>
         </div>
     );
