@@ -21,9 +21,9 @@ const CardsProjects = ({ project, className }: ProjectCardPropsType) => {
                 <h4>{project.title}</h4>
 
                 <p>
-                    {project.text1?.length > 120
-                        ? project.text1.slice(0, 120) + "..."
-                        : project.text1}
+                    {project.text2?.length > 120
+                        ? project.text2.slice(0, 120) + "..."
+                        : project.text2}
                 </p>
 
                 <Link className="btn-read" to={`/projects/${project.id}`}>
