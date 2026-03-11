@@ -24,41 +24,37 @@ const ProjectsByType = () => {
             <PageTitle currentPage={typeName} title={typeName} />
 
             <div className="container section-padding">
-                <h2>Projects</h2>
+    <h2 className="mb-5">Projects</h2>
 
-                <div className="row">
-                    {projects.map((project: any) => (
-                        <div
-                            className="col-xl-3 col-lg-4 col-md-6 col-sm-12 mb-4"
-                            key={project.id}
-                        >
-                            <div className="card h-100 shadow-sm border-0">
-                                <div className="card-body d-flex flex-column">
-                                    <h5 className="card-title text-truncate">
-                                        {project.title}
-                                    </h5>
+    {projects.map((project: any) => (
+        <div key={project.id} className="mb-5 pb-4 border-bottom">
 
-                                    <p className="card-text">
-                                        {project.text1?.length > 120
-                                            ? project.text1.substring(0, 120) +
-                                              "..."
-                                            : project.text1}
-                                    </p>
+            {/* Title */}
+            <h3 className="mb-3">{project.title}</h3>
 
-                                    <div className="mt-auto">
-                                        <Link
-                                            className="btn btn-primary btn-read btn-sm"
-                                            to={`/projects/${project.id}`}
-                                        >
-                                            Read More
-                                        </Link>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            </div>
+            {/* Description */}
+            {project.description && (
+                <p className="mb-3">{project.description}</p>
+            )}
+
+            {/* Text1 */}
+            {project.text1 && (
+                <p className="mb-3">{project.text1}</p>
+            )}
+
+            {/* Text2 */}
+            {project.text2 && (
+                <p className="mb-3">{project.text2}</p>
+            )}
+
+            {/* Text3 */}
+            {project.text3 && (
+                <p className="mb-3">{project.text3}</p>
+            )}
+
+        </div>
+    ))}
+</div>
         </>
     );
 };
