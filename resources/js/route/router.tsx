@@ -23,6 +23,7 @@ import ContactAdminPage from "@/pages/ContactAdminPage";
 import AdminHomeImage from "@/pages/AdminHomeImage";
 import Careers from "@/pages/Careers";
 import AdminTypes from "@/pages/AdminTypes";
+import ProjectsByType from "@/pages/ProjectsByType";
 export const router = createBrowserRouter([
     {
         path: "/",
@@ -103,6 +104,10 @@ export const router = createBrowserRouter([
             {
                 path: "/dashboard/services/edit/:id",
                 element: <EditService />,
+            },
+            {
+                path: "/projects/type/:id",
+                element: <ProjectsByType />,
             },
 
             {

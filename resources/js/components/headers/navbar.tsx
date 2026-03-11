@@ -33,34 +33,18 @@ function Navbar() {
                 const updatedMenu = menuData.map((menu) => {
                     switch (menu.title.toLowerCase()) {
                         case "projects": {
-                            const typeMap: Record<string, any[]> = {};
+                            const typeMap: Record<number, string> = {};
 
                             types.forEach((project: any) => {
-                                if (!project.types?.length) {
-                                    if (!typeMap["Other"])
-                                        typeMap["Other"] = [];
-                                    typeMap["Other"].push(project);
-                                }
-
-                                project.types.forEach((type: any) => {
-                                    const typeName = type.project_type;
-
-                                    if (!typeMap[typeName]) {
-                                        typeMap[typeName] = [];
-                                    }
-
-                                    typeMap[typeName].push(project);
+                                project.types?.forEach((type: any) => {
+                                    typeMap[type.id] = type.project_type;
                                 });
                             });
 
                             const projectMenu = Object.entries(typeMap).map(
-                                ([typeName, projects]) => ({
-                                    title: typeName,
-                                    link: "#",
-                                    submenu: projects.map((project: any) => ({
-                                        title: project.title,
-                                        link: `/projects/${project.id}`,
-                                    })),
+                                ([id, name]) => ({
+                                    title: name,
+                                    link: `/projects/type/${id}`,
                                 }),
                             );
 
@@ -106,7 +90,6 @@ function Navbar() {
         <ul>
             {dynamicMenu.map(({ link, title, submenu }, index) => (
                 <li
-                   
                     key={index}
                     className={`${submenu?.length ? "has-dropdown" : ""}`}
                 >

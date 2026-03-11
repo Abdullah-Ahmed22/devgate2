@@ -16,7 +16,7 @@ use App\Http\Controllers\TypeController;
 
 Route::post('/admin/login', [AdminAuthController::class, 'login']);
  Route::get('/types', [TypeController::class, 'index']);
-
+Route::get('/types/{id}/projects', [TypeController::class, 'projects']);
 Route::get('/homeimage',[HomeImageController::class, 'index'])->name('index');
 
 // Route::get('/researchsurveys', [ResearchSurveyController::class, 'index']);
@@ -42,7 +42,7 @@ Route::post('/contactus', [ContactUsController::class, 'store'])->name('store');
 
 Route::get('/statistics', [StatisticController::class, 'index']);
 Route::get('/statistics/{id}', [StatisticController::class, 'show']);
-
+Route::get('/types/{id}', [TypeController::class, 'show']);
 
 Route::middleware('auth:sanctum')->group(function () {
 
@@ -79,7 +79,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/projects/{id}/edit', [ProjectController::class, 'edit'])->where(['id' => '[0-9]+'])->name('edit');
  Route::put('/projects/{id}', [ProjectController::class, 'update'])->where(['id' => '[0-9]+'])->name('update');
 
-Route::get('/types/{id}', [TypeController::class, 'show']);
+
 Route::post('/types', [TypeController::class, 'store']);
 
 Route::put('/types/{id}', [TypeController::class, 'update']);

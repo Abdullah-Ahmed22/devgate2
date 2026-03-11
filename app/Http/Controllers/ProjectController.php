@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Storage;
 
 class ProjectController extends Controller
 {
+
+
      public function index(){ // Return all projects from database
 
         $allProjects = Project::with('types')->get();

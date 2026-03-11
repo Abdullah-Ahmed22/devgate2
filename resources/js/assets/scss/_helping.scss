@@ -149,12 +149,19 @@ br {
   }
 }
 
-/* background */
+
 .bg-cover {
   background-repeat: no-repeat;
   background-size: cover;
   position: relative;
   background-position: center;
+  margin-top: 64px;
+}
+
+@media (min-width: 992px) {
+  .bg-cover {
+    margin-top: 97px;
+  }
 }
 
 //>>>>> Nice Select Css Start <<<<<//

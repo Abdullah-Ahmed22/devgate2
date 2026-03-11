@@ -14,6 +14,13 @@ class TypeController extends Controller
         return response()->json($allTypes);
     }
 
+    public function projects($id)
+{
+    $type = Type::with('projects')->findOrFail($id);
+
+    return response()->json($type->projects);
+}
+
     public function show($id){ // Return specific type from database
 
         $specificType = Type::findorfail($id);
