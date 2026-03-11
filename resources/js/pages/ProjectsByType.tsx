@@ -23,41 +23,56 @@ const ProjectsByType = () => {
         <>
             <PageTitle currentPage={typeName} title={typeName} />
 
-            <div className="container section-padding">
-    <h2 className="mb-5">Projects</h2>
+            <div className="container section-padding px-3 px-md-4">
+                <h2 className="mb-5">Projects</h2>
 
-    {projects.map((project: any) => (
-        <div key={project.id} className="mb-5 pb-4 border-bottom">
+                {projects.map((project: any) => (
+                    <div
+                        key={project.id}
+                        className="project-item mb-5 pb-4 border-bottom"
+                    >
+                        <h3 className="mb-3">{project.title}</h3>
 
-            {/* Title */}
-            <h3 className="mb-3">{project.title}</h3>
+                        {project.text1 && (
+                            <p
+                                className="mb-3"
+                                style={{
+                                    whiteSpace: "pre-line",
+                                    textAlign: "left",
+                                }}
+                            >
+                                {project.text1}
+                            </p>
+                        )}
 
-            {/* Description */}
-            {project.description && (
-                <p className="mb-3">{project.description}</p>
-            )}
+                        {project.text2 && (
+                            <p
+                                className="mb-3"
+                                style={{
+                                    whiteSpace: "pre-line",
+                                    textAlign: "left",
+                                }}
+                            >
+                                {project.text2}
+                            </p>
+                        )}
 
-            {/* Text1 */}
-            {project.text1 && (
-                <p className="mb-3">{project.text1}</p>
-            )}
-
-            {/* Text2 */}
-            {project.text2 && (
-                <p className="mb-3">{project.text2}</p>
-            )}
-
-            {/* Text3 */}
-            {project.text3 && (
-                <p className="mb-3">{project.text3}</p>
-            )}
-
-        </div>
-    ))}
-</div>
+                        {project.text3 && (
+                            <p
+                                className="mb-3 "
+                                style={{
+                                    whiteSpace: "pre-line",
+                                    textAlign: "left",
+                                }}
+                            >
+                                {project.text3}
+                            </p>
+                        )}
+                    </div>
+                ))}
+            </div>
         </>
     );
 };
 
 export default ProjectsByType;
-

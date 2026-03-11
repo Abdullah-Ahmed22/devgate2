@@ -49,42 +49,24 @@ const MobileNavBar = () => {
                 const updatedMenu = menuData.map((menu) => {
                     switch (menu.title.toLowerCase()) {
                         case "projects": {
-                            const typeMap: Record<string, any[]> = {};
+    const typesMap: Record<number, string> = {};
 
-                            projects.forEach((project: any) => {
-                                if (!project.types?.length) {
-                                    if (!typeMap["Other"])
-                                        typeMap["Other"] = [];
-                                    typeMap["Other"].push(project);
-                                }
+    projects.forEach((project: any) => {
+        project.types?.forEach((type: any) => {
+            typesMap[type.id] = type.project_type;
+        });
+    });
 
-                                project.types.forEach((type: any) => {
-                                    const typeName = type.project_type;
+    const projectMenu = Object.entries(typesMap).map(([id, name]) => ({
+        title: name,
+        link: `/projects/type/${id}`,
+    }));
 
-                                    if (!typeMap[typeName]) {
-                                        typeMap[typeName] = [];
-                                    }
-
-                                    typeMap[typeName].push(project);
-                                });
-                            });
-
-                            const projectMenu = Object.entries(typeMap).map(
-                                ([typeName, items]) => ({
-                                    title: typeName,
-                                    link: "#",
-                                    submenu: items.map((project: any) => ({
-                                        title: project.title,
-                                        link: `/projects/${project.id}`,
-                                    })),
-                                }),
-                            );
-
-                            return {
-                                ...menu,
-                                submenu: projectMenu,
-                            };
-                        }
+    return {
+        ...menu,
+        submenu: projectMenu,
+    };
+}
 
                         case "services":
                             return {
