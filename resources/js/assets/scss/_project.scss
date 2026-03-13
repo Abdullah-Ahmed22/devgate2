@@ -418,12 +418,21 @@
   flex: 1;
 }
 
+
+
 .service-content h4 {
   font-size: 18px;
   font-weight: 700;
   margin-bottom: 12px;
   text-transform: uppercase;
   color: #1b5e20; 
+}
+
+.service-content h4 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3; 
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .service-content p {
